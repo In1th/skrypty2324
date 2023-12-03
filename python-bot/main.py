@@ -9,6 +9,7 @@ from sentence_transformers import SentenceTransformer
 from userConvoStorage import UserConversationStorage
 from event import EventStorage
 from logMisunderstanding import logMisunderstanding
+from eventsDb import EventsDb
 
 load_dotenv()
 TOKEN = os.getenv('TOKEN')
@@ -23,6 +24,7 @@ bot = commands.Bot(command_prefix='$', intents=intents)
 users = UserConversationStorage()
 events = EventStorage()
 prevMsg: dict[int, tuple[int, str, str]] = {}
+# db = EventsDb()
 
 pinecone.init(api_key=os.getenv("PINECONE"), environment="gcp-starter")
 index = pinecone.Index("responses")
@@ -42,12 +44,16 @@ def handle(event, content, id):
      events.clearEvent(id)
   return msg
 
+def welcomeMsg(name):
+   return f"""Hi **{name}**! I'm your friendly event organizer bot, please tell me what you want to do.
+**Remember**: if I miunderstand you, please tell me that's not what you meant."""
+
 @client.event
 async def on_message(message: dc.Message):
     if message.channel.type == dc.ChannelType.private and not message.author.bot:
         scenario = users.getScenarioFor(message.author.id)
         if scenario is None:
-            await message.channel.send(f"Hi {message.author.name}! I'm your friendly event organizer bot, please tell me what you want to do. Remember: if I miunderstand you, please tell me that's not what you meant. ")
+            await message.channel.send(welcomeMsg(message.author.name))
             users.setScenario(message.author.id, 0)
             return
         
@@ -71,7 +77,7 @@ async def on_message(message: dc.Message):
 
         elif newScenario != 0 and event is None:
           users.setScenario(message.author.id, newScenario)
-          ev = events.getEvent(newScenario)
+          ev = events.getEvent(message.author.id, newScenario)
 
           if ev is not None and ev.isNow():
              msg = handle(ev, message.content, message.author.id)
