@@ -5,14 +5,21 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "backend": "nodemon index.js"
+    "backend": "nodemon index.js",
+    "start": "node index.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.18.2"
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "sql-template-strings": "^2.2.2",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.6",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
+    "@faker-js/faker": "^8.3.1",
     "nodemon": "^3.0.2"
   }
 }
