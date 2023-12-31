@@ -1,6 +1,6 @@
 import { useRef } from "react";
 
-export const Img = ({url: src, className}) => {
+export const Img = ({src, className}) => {
 
     const imageRef = useRef(null);
 
